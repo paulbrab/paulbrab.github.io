@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stableford</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            background-color: #eee;
+        }
+
+        .form {
+            width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 10%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        input {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        #app {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #points {
+            text-align: center;
+            font-size: 24px;
+        }
+
+        #points p {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="form">
+            <div class="form-group">
+                <label for="index">Index</label>
+                <select name="index" id="index">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="par">Par</label>
+                <select name="par" id="par">
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+            <!-- section for the player to enter their handicap -->
+            <div class="form-group">
+                <label for="handicap">Handicap</label>
+                <input type="number" id="handicap" name="handicap" value="0">
+            </div>
+            <div class="form-group">
+                <div id="shotsRecieved">
+                    <p>Shots Received: 0</p>
+                </div>
+            </div>
+            <!-- section for the player to enter their score with plus and minus buttons to help them-->
+            <div class="form-group">
+                <label for="score">Score</label>
+                <button id="minus">-</button>
+                <input type="number" id="score" name="score">
+                <button id="plus">+</button>
+            </div>
+            <!-- section to show the players points based on the index, par and score -->
+            <div class="form-group">
+                <div id="points">
+                    <p>Points: 0</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script type="text/javascript">
+        document.getElementById('index').addEventListener('change', function() {
+            calculatePoints();
+        });
+
+        document.getElementById('handicap').addEventListener('change', function() {
+            calculatePoints();
+        });
+
+        document.getElementById('plus').addEventListener('click', function() {
+            document.getElementById('score').value++;
+            calculatePoints();
+        });
+        document.getElementById('minus').addEventListener('click', function() {
+            document.getElementById('score').value--;
+            calculatePoints();
+        });
+        document.getElementById('par').addEventListener('change', function() {
+            calculatePoints();
+        });
+
+        function calculateShotsRecieved(handicap, index) {
+            // =if ($G$2 > 18,if (C2 <= $G$2 - 18, 2, 1),if (C2 <= $G$2, 1, 0))
+            let shotsRecieved = 0;
+            if(handicap > 18) {
+                if(index <= handicap - 18) {
+                    shotsRecieved = 2;
+                } else {
+                    shotsRecieved = 1;
+                }
+            } else {
+                if(index <= handicap) {
+                    shotsRecieved = 1;
+                } else {
+                    shotsRecieved = 0;
+                }
+            }
+
+            document.getElementById('shotsRecieved').innerHTML = `Shots Received: ${shotsRecieved}`
+
+            return shotsRecieved;
+        }
+        function calculatePoints() {
+            // calculate the points when the score changes
+            let index = +document.getElementById('index').value;
+            let par = +document.getElementById('par').value;
+            let score = +document.getElementById('score').value;
+            let handicap = +document.getElementById('handicap').value;
+
+            let points = 0;
+            let shotsRecieved = calculateShotsRecieved(handicap, index);
+            if(score > 0) {
+                // =if(E2>0,2-(E2-(B2+D2)),0)
+                // E2 = score
+                // B2 = par
+                // D2 = shotsRecieved
+                points = 2 - (score - (par + shotsRecieved));
+            }
+
+            document.getElementById('points').innerHTML = `Points: ${points}`
+
+        }
+    </script>
+</body>
